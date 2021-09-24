@@ -1,6 +1,6 @@
 {
-	"name": "<name>",
-	"version": "<version>",
+	"name": "@t99/http-server",
+	"version": "0.1.0",
 	"description": "<desc>",
 	"main": "js/main",
 	"types": ".d.ts/main",
@@ -16,9 +16,12 @@
 	"author": "Trevor Sears <trevor@trevorsears.com> (https://trevorsears.com/)",
 	"license": "GPL-3.0-or-later",
 	"bugs": {
-		"url": "https://github.com/<github_org>/<base_name>/issues"
+		"url": "https://github.com/T99/http-server-js/issues"
 	},
-	"homepage": "https://github.com/<github_org>/<base_name>#readme",
+	"homepage": "https://github.com/http-server-js#readme",
+	"dependencies": {
+		"@t99/http": "file:../http-js"
+	},
 	"devDependencies": {
 		"typescript": "latest",
 		"tslint": "latest",
