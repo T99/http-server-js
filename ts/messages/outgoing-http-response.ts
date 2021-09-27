@@ -1,8 +1,16 @@
+import http from "http";
 import { AbstractOutgoingHTTPResponse } from "@t99/http";
 
 export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 	
 	protected timestamp: number | undefined;
+	
+	public static fromNodeServerResponse(response: http.ServerResponse): OutgoingHTTPResponse {
+		
+		// TODO [9/27/2021 @ 4:16 PM] Finish me!
+		return new OutgoingHTTPResponse(undefined as any);
+		
+	}
 	
 	public hasBeenSent(): boolean {
 		
