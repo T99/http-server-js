@@ -5,16 +5,6 @@ import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
 
 export abstract class AbstractRouter implements MiddlewareExecutor {
 	
-	/*
-	 * There are only 3 main kinds of request routing:
-	 *  - string
-	 *  - regex/param (express: '/:id/')
-	 *  - file system/file name routing
-	 * 
-	 *  - do not allow regex without param
-	 *  - group neighboring strings into trie?
-	 */
-	
 	/**
 	 * A {@link MiddlewareManager} instance responsible for handling/managing the Middleware attached to this
 	 * AbstractRouter.
@@ -22,7 +12,7 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 	protected middlewareManager: MiddlewareManager;
 	
 	/**
-	 * An array of {@link AbstractRouter}s, which serve as sub-routers that will attempt to 
+	 * An array of {@link AbstractRouter}s, which serve as sub-routers that will attempt to further route requests.
 	 */
 	protected routes: AbstractRouter[];
 	
@@ -47,7 +37,7 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 	/**
 	 * Returns a Promise that will resolve to true if this AbstractRouter instance should take/route the specified HTTP
 	 * request.
-	 * 
+	 *
 	 * @param {IncomingHTTPRequest} request The HTTP request in question (the request to determine whether or not to
 	 * route).
 	 * @param {OutgoingHTTPResponse} response The HTTP response associated with the HTTP request in question.
@@ -62,25 +52,41 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 		
 		for (let i: number = 0; i < this.routes.length && !response.hasBeenSent(); i++) {
 			
-			if (await this.routes[i].shouldRoute(request, response)) await this.routes[i].route(request, response);
+			if (await this.routes[i].shouldRoute(request, response)) {
+				
+				await this.routes[i].route(request, response);
+				
+				await this.middlewareManager.executePostHandlerMiddleware(request, response);
+				
+				return;
+				
+			}
 			
 		}
 		
-		await this.middlewareManager.executePostHandlerMiddleware(request, response);
+		
 		
 	}
 	
 	/**
-	 * Adds a sub-router to this AbstractRouter instance, returning the sub-router to allow for chained calls to this
-	 * method.
-	 * 
-	 * @param {R} router
-	 * @returns {R}
+	 * Chains the given AbstractRouter instances together, adding them together and returning the 'tail' of the chain of
+	 * added AbstractRouters.
+	 *
+	 * @param {AbstractRouter[]} routers A list of AbstractRouter instances that should be chained together.
+	 * @returns {AbstractRouter} The 'tail' of the chain of added AbstractRouters.
 	 */
-	public addRoute<R extends AbstractRouter>(router: R): R {
+	public addRoute(...routers: [AbstractRouter, ...AbstractRouter[]]): AbstractRouter {
 		
-		this.routes.push(router);
-		return router;
+		let tailRouter: AbstractRouter = this;
+		
+		for (let router of routers) {
+			
+			tailRouter.routes.push(router);
+			tailRouter = router;
+			
+		}
+		
+		return tailRouter;
 		
 	}
 	
