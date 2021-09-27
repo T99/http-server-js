@@ -1,9 +1,9 @@
 import { SimpleStringAbstractRouter } from "./simple-string-abstract-router";
+import { MatcherFunction } from "./simple-abstract-router";
 import { IncomingHTTPRequest } from "../messages/incoming-http-request";
 import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
-import { MatcherFunction } from "./simple-abstract-router";
 
-export class PathRouter extends SimpleStringAbstractRouter {
+export class SubdomainRouter extends SimpleStringAbstractRouter {
 	
 	public constructor(content: string, caseSensitive?: boolean, parameter?: string);
 	public constructor(regex: RegExp, parameter?: string);
@@ -16,7 +16,7 @@ export class PathRouter extends SimpleStringAbstractRouter {
 		
 		this.addMiddlewareAtBeginning((request: IncomingHTTPRequest): void => {
 			
-			request.getRoutingInfo().popNextPathComponent();
+			request.getRoutingInfo().popNextSubdomain();
 			
 		});
 		
@@ -24,7 +24,7 @@ export class PathRouter extends SimpleStringAbstractRouter {
 	
 	protected async supply(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<string | undefined> {
 		
-		return request.getRoutingInfo().peekNextPathComponent();
+		return request.getRoutingInfo().peekNextSubdomain();
 		
 	}
 	
