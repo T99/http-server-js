@@ -1,5 +1,5 @@
 import { MiddlewareExecutor } from "./middleware-executor";
-import { Middleware } from "./middleware";
+import { Middleware, Middlewareable } from "./middleware";
 import { IncomingHTTPRequest } from "../messages/incoming-http-request";
 import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
 
@@ -57,28 +57,28 @@ export class MiddlewareManager implements MiddlewareExecutor {
 		
 	}
 	
-	public addMiddlewareAtBeginning(middleware: Middleware): void {
+	public addMiddlewareAtBeginning(middleware: Middlewareable): void {
 		
-		this.preHandlerMiddleware.unshift(middleware);
-		
-	}
-	
-	public addMiddlewareBeforeHandler(middleware: Middleware): void {
-		
-		this.preHandlerMiddleware.push(middleware);
+		this.preHandlerMiddleware.unshift(Middleware.normalizeMiddlewareable(middleware));
 		
 	}
 	
-	public addMiddlewareAfterHandler(middleware: Middleware): void {
+	public addMiddlewareBeforeHandler(middleware: Middlewareable): void {
 		
-		this.postHandlerMiddleware.unshift(middleware);
+		this.preHandlerMiddleware.push(Middleware.normalizeMiddlewareable(middleware));
 		
 	}
 	
-	public addMiddlewareAtEnd(middleware: Middleware): void {
+	public addMiddlewareAfterHandler(middleware: Middlewareable): void {
 		
-		this.postHandlerMiddleware.push(middleware);
+		this.postHandlerMiddleware.unshift(Middleware.normalizeMiddlewareable(middleware));
 		
 	}
-	 
+	
+	public addMiddlewareAtEnd(middleware: Middlewareable): void {
+		
+		this.postHandlerMiddleware.push(Middleware.normalizeMiddlewareable(middleware));
+		
+	}
+	
 }

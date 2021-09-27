@@ -1,10 +1,10 @@
-import { Middleware } from "./middleware";
+import { Middlewareable } from "./middleware";
 
-export type MiddlewareRegistrationFunction = (middleware: Middleware) => void;
+export type MiddlewareRegistrationFunction = (middleware: Middlewareable) => void;
 
 /**
  * An interface representative of a type that has/runs Middleware.
- * 
+ *
  * @author Trevor Sears <trevorsears.main@gmail.com>
  * @version v0.1.0
  * @since v0.1.0
@@ -16,7 +16,7 @@ export interface MiddlewareExecutor {
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareAtBeginning(middleware: Middleware): void;
+	addMiddlewareAtBeginning(middleware: Middlewareable): void;
 	
 	/**
 	 * Adds the specified middleware in such a way as to run before this MiddlewareExecutor's #handler method, but
@@ -24,7 +24,7 @@ export interface MiddlewareExecutor {
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareBeforeHandler(middleware: Middleware): void;
+	addMiddlewareBeforeHandler(middleware: Middlewareable): void;
 	
 	/**
 	 * Adds the specified middleware in such a way as to run after this MiddlewareExecutor's #handler method, but
@@ -32,13 +32,13 @@ export interface MiddlewareExecutor {
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareAfterHandler(middleware: Middleware): void;
+	addMiddlewareAfterHandler(middleware: Middlewareable): void;
 	
 	/**
 	 * Adds the specified middleware after all other middleware for this MiddlewareExecutor.
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareAtEnd(middleware: Middleware): void;
+	addMiddlewareAtEnd(middleware: Middlewareable): void;
 	
 }

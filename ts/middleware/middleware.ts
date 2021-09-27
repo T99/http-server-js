@@ -1,9 +1,10 @@
-import { HTTPRequest, HTTPResponse } from "@t99/http";
+import { IncomingHTTPRequest } from "../messages/incoming-http-request";
+import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
 
 /**
  * The form of a function that can be used as a Middleware with a {@link MiddlewareExecutor}.
  */
-export type MiddlewareFunction = (request: HTTPRequest, response: HTTPResponse) => Promise<void>;
+export type MiddlewareFunction = (request: IncomingHTTPRequest, response: OutgoingHTTPResponse) => void | Promise<void>;
 
 /**
  * A more generic definition of 'Middleware' that can accept either a more formal object instance of the
@@ -29,7 +30,7 @@ export abstract class Middleware {
 	 * @param {HTTPResponse} response An object representative of the response being prepared for the client.
 	 * @returns {Promise<void>} A Promise that resolves once the middleware function has completed.
 	 */
-	public abstract execute(request: HTTPRequest, response: HTTPResponse): Promise<void>;
+	public abstract execute(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): void | Promise<void>;
 	
 	/**
 	 * Creates and returns a Middleware instance from a functional middleware declaration.
