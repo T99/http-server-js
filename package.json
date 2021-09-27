@@ -26,6 +26,7 @@
 		"typescript": "latest",
 		"tslint": "latest",
 		"@types/jest": "latest",
+		"@types/node": "^14.17.4",
 		"del": "latest",
 		"gulp": "latest",
 		"gulp-sourcemaps": "latest",
