@@ -42,7 +42,7 @@ export class RoutingInfo {
 		);
 		this.pathComponentsIndex = 0;
 		this.doesHaveTrailingSlash = this.url.pathname.charAt(this.url.pathname.length - 1) === "/";
-			
+		
 		this.routingParameters = new Map();
 		
 		
@@ -80,7 +80,37 @@ export class RoutingInfo {
 	
 	public peekNextSubdomain(): string | undefined {
 		
+		return this.subdomainComponents[this.subdomainComponentsIndex];
 		
+	}
+	
+	public popNextSubdomain(): string | undefined {
+		
+		return this.subdomainComponents[this.subdomainComponentsIndex++];
+		
+	}
+	
+	public getPathComponents(): string[] {
+		
+		return this.pathComponents;
+		
+	}
+	
+	public hasNextPathComponent(): boolean {
+		
+		return this.pathComponentsIndex < this.pathComponents.length;
+		
+	}
+	
+	public peekNextPathComponent(): string | undefined {
+		
+		return this.pathComponents[this.pathComponentsIndex];
+		
+	}
+	
+	public popNextPathComponent(): string | undefined {
+		
+		return this.pathComponents[this.pathComponentsIndex++];
 		
 	}
 	
