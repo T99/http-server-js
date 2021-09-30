@@ -2,6 +2,7 @@ import { MiddlewareExecutor, MiddlewareRegistrationFunction } from "../middlewar
 import { MiddlewareManager } from "../middleware/middleware-manager";
 import { IncomingHTTPRequest } from "../messages/incoming-http-request";
 import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
+import { MiddlewareFunction } from "../middleware/middleware";
 
 export abstract class AbstractRouter implements MiddlewareExecutor {
 	
@@ -15,6 +16,8 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 	 * An array of {@link AbstractRouter}s, which serve as sub-routers that will attempt to further route requests.
 	 */
 	protected routes: AbstractRouter[];
+	
+	protected handler: MiddlewareFunction | undefined;
 	
 	public addMiddlewareAtBeginning: MiddlewareRegistrationFunction;
 	public addMiddlewareBeforeHandler: MiddlewareRegistrationFunction;
@@ -64,7 +67,7 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 			
 		}
 		
-		
+		await request.getRecipientServer().handleUnhandledRequest(request, response);
 		
 	}
 	
@@ -87,6 +90,42 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 		}
 		
 		return tailRouter;
+		
+	}
+	
+	/**
+	 * Returns true if this AbstractRouter instance currently has an attached handler function to handle requests that
+	 * terminate at this router.
+	 *
+	 * @returns {boolean} true if this AbstractRouter instance currently has an attached handler function.
+	 */
+	public hasHandler(): boolean {
+		
+		return (this.handler !== undefined);
+		
+	}
+	
+	/**
+	 * Attaches the provided function to this AbstractRouter instance, utilizing it as the primary handler for requests
+	 * that terminate at this router.
+	 *
+	 * @param {MiddlewareFunction | undefined} handler The handler function to attach to this AbstractRouter instance,
+	 * or undefined to 'delete'/'remove' the handler currently attached to this router.
+	 */
+	public attachHandler(handler: MiddlewareFunction | undefined): void {
+		
+		this.handler = handler;
+		
+	}
+	
+	/**
+	 * Detaches/removes the handler from this AbstractRouter instance.
+	 *
+	 * Equivalent to calling `attachHandler(undefined)`.
+	 */
+	public detachHandler(): void {
+		
+		this.handler = undefined;
 		
 	}
 	
