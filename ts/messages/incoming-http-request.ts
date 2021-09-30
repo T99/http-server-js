@@ -1,10 +1,7 @@
 import http from "http";
-import { AbstractIncomingHTTPRequest, HTTPRequestConfig } from "@t99/http";
+import { AbstractIncomingHTTPRequest, HTTPRequestConfig, HTTPHeadersManager } from "@t99/http";
 import { RoutingInfo } from "../routing/routing-info";
 import { HTTPServer } from "../http-server";
-import { HTTPVersionObject } from "../../../http-js/ts/parsing/http-version-parsing";
-import { HTTPMethod } from "../../../http-js/ts/schema/http-method";
-import { HTTPHeadersManager, ParseableHTTPHeaders } from "../../../http-js/ts/headers/http-headers-manager";
 
 export type IncomingHTTPRequestConfig = HTTPRequestConfig & {
 	
@@ -42,7 +39,13 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 										  timestamp: number = Date.now()): IncomingHTTPRequest {
 		
 		let protocol: string = "encrypted" in request.socket ? "https" : "http";
-		let headers: ParseableHTTPHeaders
+		let headers: HTTPHeadersManager = new HTTPHeadersManager();
+		
+		for (let i: number = 0; i < request.rawHeaders.length; i += 2) {
+			
+			headers.setHeader(request.rawHeaders[i], request.rawHeaders[i + 1]);
+			
+		}
 		
 		return new IncomingHTTPRequest({
 			version: {
@@ -51,7 +54,7 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 			},
 			method: request.method as string,
 			url: new URL(request.url as string, `${protocol}://${request.headers.host}`),
-			headers?: ,
+			headers,
 			timeReceived: timestamp,
 			originalRequest: request,
 			recipientServer
