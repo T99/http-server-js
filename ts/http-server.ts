@@ -39,7 +39,7 @@ export class HTTPServer extends AbstractRouter {
 	
 	protected server: http.Server;
 	
-	public constructor() {
+	protected constructor() {
 		
 		super();
 		
@@ -62,7 +62,18 @@ export class HTTPServer extends AbstractRouter {
 		
 		// TODO [9/30/2021 @ 3:18 PM] Handle `this.server.on("error", () => ...);`
 		
-		this.server.listen()
+	}
+	
+	public static initialize(port: number): Promise<HTTPServer> {
+		
+		let server: HTTPServer = new HTTPServer();
+		
+		return new Promise<HTTPServer>((resolve: (value: HTTPServer) => void,
+										reject: (reason?: any) => void): void => {
+			
+			server.server.listen(port, (): void => resolve(server));
+			
+		});
 		
 	}
 	
