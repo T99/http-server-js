@@ -49,28 +49,6 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 	 */
 	public abstract shouldRoute(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<boolean>;
 	
-	public async route(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<void> {
-		
-		await this.middlewareManager.executePreHandlerMiddleware(request, response);
-		
-		for (let i: number = 0; i < this.routes.length && !response.hasBeenSent(); i++) {
-			
-			if (await this.routes[i].shouldRoute(request, response)) {
-				
-				await this.routes[i].route(request, response);
-				
-				await this.middlewareManager.executePostHandlerMiddleware(request, response);
-				
-				return;
-				
-			}
-			
-		}
-		
-		await request.getRecipientServer().handleUnhandledRequest(request, response);
-		
-	}
-	
 	/**
 	 * Chains the given AbstractRouter instances together, adding them together and returning the 'tail' of the chain of
 	 * added AbstractRouters.
@@ -90,6 +68,34 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 		}
 		
 		return tailRouter;
+		
+	}
+	
+	public async route(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<void> {
+		
+		// Run the pre-handler middleware(s).
+		await this.middlewareManager.executePreHandlerMiddleware(request, response);
+		
+		// Search for a sub-route to further route the request.
+		for (let i: number = 0; i < this.routes.length && !response.hasBeenSent(); i++) {
+			
+			if (await this.routes[i].shouldRoute(request, response)) {
+				
+				await this.routes[i].route(request, response);
+				
+				await this.middlewareManager.executePostHandlerMiddleware(request, response);
+				
+				return;
+				
+			}
+			
+		}
+		
+		if (await request.getRecipientServer().checkRequestFulfillment(request, response) && this.hasHandler()) {
+			
+			await this.handle(request, response);
+			
+		} else await request.getRecipientServer().handleUnhandledRequest(request, response);
 		
 	}
 	
@@ -126,6 +132,13 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 	public detachHandler(): void {
 		
 		this.handler = undefined;
+		
+	}
+	
+	public async handle(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<void> {
+		
+		if (this.handler !== undefined) return await this.handler(request, response);
+		else throw new Error("Attempted to handle incoming request with handler-less AbstractRouter instance.");
 		
 	}
 	

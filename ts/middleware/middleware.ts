@@ -4,7 +4,7 @@ import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
 /**
  * The form of a function that can be used as a Middleware with a {@link MiddlewareExecutor}.
  */
-export type MiddlewareFunction = (request: IncomingHTTPRequest, response: OutgoingHTTPResponse) => void | Promise<void>;
+export type MiddlewareFunction<T = void> = (request: IncomingHTTPRequest, response: OutgoingHTTPResponse) => T | Promise<T>;
 
 /**
  * A more generic definition of 'Middleware' that can accept either a more formal object instance of the
