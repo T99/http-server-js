@@ -11,7 +11,7 @@ export type IncomingHTTPRequestConfig = HTTPRequestConfig & {
 	
 	recipientServer: HTTPServer
 	
-}
+};
 
 export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 	
@@ -35,6 +35,7 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 	}
 	
 	public static fromNodeIncomingMessage(request: http.IncomingMessage,
+										  response: http.ServerResponse,
 										  recipientServer: HTTPServer,
 										  timestamp: number = Date.now()): IncomingHTTPRequest {
 		
