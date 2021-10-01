@@ -56,7 +56,7 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 	 * @param {AbstractRouter[]} routers A list of AbstractRouter instances that should be chained together.
 	 * @returns {AbstractRouter} The 'tail' of the chain of added AbstractRouters.
 	 */
-	public addRoute(...routers: [AbstractRouter, ...AbstractRouter[]]): AbstractRouter {
+	public attachRouter(...routers: [AbstractRouter, ...AbstractRouter[]]): AbstractRouter {
 		
 		let tailRouter: AbstractRouter = this;
 		
