@@ -62,13 +62,20 @@ export class HTTPServer extends AbstractRouter {
 		this.server = http.createServer();
 		
 		this.server.on("request", (rawRequest: http.IncomingMessage, rawResponse: http.ServerResponse): void => {
-		
-			let request: IncomingHTTPRequest = IncomingHTTPRequest.fromNodeIncomingMessage(rawRequest, this);
-			let response: OutgoingHTTPResponse = OutgoingHTTPResponse.fromNodeServerResponse(rawResponse, this);
+			
+			let request: IncomingHTTPRequest =
+				IncomingHTTPRequest.fromNodeIncomingMessage(rawRequest, rawResponse, this);
+			
+			let response: OutgoingHTTPResponse =
+				OutgoingHTTPResponse.fromNodeServerResponse(rawRequest, rawResponse, this);
+			
+			request.setMatchingResponse(response);
+			response.setMatchingRequest(request);
 			
 			this.route(request, response).catch((error: any): void => {
 				
 				// TODO [9/30/2021 @ 3:16 PM] Properly log the error!
+				console.log(`error!`);
 				
 			});
 		
