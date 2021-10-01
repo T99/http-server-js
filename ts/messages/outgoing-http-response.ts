@@ -58,11 +58,89 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		
 	}
 	
+	public async sendError(error: ClientAccessibleError): Promise<void> {
+		
+		this.setStatusCode(error.getHTTPStatusCode());
+		
+	}
+	
+	public getPreparedBody(): string {
+		
+		let bodyType: string = typeof this.body;
+		
+		switch (bodyType) {
+			
+			case "string":
+				return this.body;
+			
+			case "object":
+			case "boolean":
+			case "number":
+				return JSON.stringify(this.body);
+			
+			case "function":
+			case "bigint":
+			case "symbol":
+				return this.body.toString();
+			
+			case "undefined":
+				throw new InternalServerError("Attempted to send undefined body to client.");
+			
+			default:
+				throw new InternalServerError(`Attempted to send body of unknown type ('${bodyType}') to ` +
+					`client.`);
+			
+		}
+	
+	}
+	
 	public send(): Promise<void> {
 		
 		if (this.hasBeenSent()) return Promise.resolve();
 		
-		return Promise.resolve(undefined);
+		this.timestamp = Date.now();
+		
+		return new Promise<void>((resolve: () => void, reject: (reason?: any) => void): void => {
+			
+			this.originalResponse.on("error", (error: Error): void => {
+				
+				reject(new InternalServerError("Error with client response.", error));
+				
+			});
+			
+			// If the data is being piped from an outside source...
+			// if (this.contentOriginStream !== undefined) {
+			//
+			// 	this.contentOriginStream.on("open", (): void => {
+			//
+			// 		this.contentOriginStream?.pipe(this.internalResponse);
+			//
+			// 	});
+			//
+			// 	this.contentOriginStream.on("end", (): void => {
+			//
+			// 		this.contentOriginStream?.close();
+			// 		this.internalResponse.end((): void => resolve());
+			//
+			// 	});
+			//
+			// } else {
+			
+			this.originalResponse.write(this.getPreparedBody(), (error: Error | null | undefined): void => {
+				
+				if (error !== null && error !== undefined) {
+					
+					reject(new InternalServerError("Error writing body to client.", error));
+					
+				}
+				
+				this.originalResponse.end((): void => resolve());
+				
+			});
+			
+			// }
+		
+		});
 		
 	}
 	
