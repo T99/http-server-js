@@ -37,11 +37,21 @@ export class RoutingInfo {
 		this.subdomainComponents = remainingHostname.split(".").reverse();
 		this.subdomainComponentsIndex = 0;
 		
-		this.pathComponents = this.url.pathname.split("/").filter(
-			(pathComponent: string): boolean => pathComponent.length === 0
-		);
+		this.pathComponents = this.url.pathname.split("/");
 		this.pathComponentsIndex = 0;
 		this.doesHaveTrailingSlash = this.url.pathname.charAt(this.url.pathname.length - 1) === "/";
+		
+		let shouldTrimFirstElement: boolean = this.pathComponents[0] === "";
+		let shouldTrimLastElement: boolean = this.pathComponents[this.pathComponents.length - 1] === "";
+		
+		if (shouldTrimFirstElement || shouldTrimLastElement) {
+			
+			this.pathComponents = this.pathComponents.slice(
+				shouldTrimFirstElement ? 1 : 0,
+				shouldTrimLastElement ? this.pathComponents.length - 1 : this.pathComponents.length
+			);
+			
+		}
 		
 		this.routingParameters = new Map();
 		
