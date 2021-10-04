@@ -27,6 +27,9 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		this.originalResponse = config.originalResponse;
 		this.sourceServer = config.sourceServer;
 		
+		this.originalResponse.statusCode = this.getStatusCode().getStatusCode();
+		this.originalResponse.statusMessage = this.getStatusCode().getExplanation();
+		
 	}
 	
 	public static fromNodeServerResponse(request: http.IncomingMessage,
@@ -35,7 +38,7 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		
 		let protocol: string = "encrypted" in request.socket ? "https" : "http";
 		
-		return new OutgoingHTTPResponse({
+		let result: OutgoingHTTPResponse = new OutgoingHTTPResponse({
 			version: sourceServer.getHTTPVersion(),
 			method: request.method as string,
 			url: new URL(request.url as string, `${protocol}://${request.headers.host}`),
@@ -43,6 +46,17 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 			originalResponse: response,
 			sourceServer
 		});
+		
+		return result;
+		
+	}
+	
+	public setStatusCode(statusCode: number | HTTPStatusCode): void {
+		
+		super.setStatusCode(statusCode);
+		
+		this.originalResponse.statusCode = this.getStatusCode().getStatusCode();
+		this.originalResponse.statusMessage = this.getStatusCode().getExplanation();
 		
 	}
 	
@@ -86,7 +100,8 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 				return this.body.toString();
 			
 			case "undefined":
-				throw new InternalServerError("Attempted to send undefined body to client.");
+				// throw new InternalServerError("Attempted to send undefined body to client.");
+				return "";
 			
 			default:
 				throw new InternalServerError(`Attempted to send body of unknown type ('${bodyType}') to ` +
