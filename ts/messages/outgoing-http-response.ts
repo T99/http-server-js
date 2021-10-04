@@ -62,6 +62,8 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		
 		this.setStatusCode(error.getHTTPStatusCode());
 		
+		await this.send();
+		
 	}
 	
 	public getPreparedBody(): string {
