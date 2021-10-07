@@ -1,4 +1,4 @@
-import { MatcherFunction, SimpleAbstractRouter } from "./simple-abstract-router";
+import { MatcherFunction, MatcherResult, SimpleAbstractRouter } from "./simple-abstract-router";
 
 export abstract class SimpleStringAbstractRouter extends SimpleAbstractRouter<string | undefined> {
 	
@@ -65,17 +65,24 @@ export abstract class SimpleStringAbstractRouter extends SimpleAbstractRouter<st
 			
 			if (parameterOrCaseSensitive ?? true) {
 				
-				matcher = (content: string | undefined): boolean => content === arg;
+				matcher = (content: string | undefined): MatcherResult<string> => {
+					
+					if (content === arg) return { didMatch: true, match: content };
+					else return { didMatch: false, match: undefined };
+					
+				};
 				
 			} else {
 				
-				matcher = (content: string | undefined): boolean => {
+				matcher = (content: string | undefined): MatcherResult<string> => {
 					
-					if (content === undefined) return arg === undefined;
-					else if (arg === undefined) return false;
-					else return content.toLowerCase() === arg.toLowerCase();
+					if (content === undefined || arg === undefined || content.toLowerCase() !== arg.toLowerCase()) {
+						
+						return { didMatch: false, match: undefined };
+						
+					} else return { didMatch: true, match: content };
 					
-				}
+				};
 				
 			}
 			
@@ -85,11 +92,12 @@ export abstract class SimpleStringAbstractRouter extends SimpleAbstractRouter<st
 			
 			if (typeof arg === "object") {
 				
-				matcher = (content: string | undefined): boolean => {
+				matcher = (content: string | undefined): MatcherResult<string> => {
 					
-					return (content === undefined ? false : arg.test(content));
+					if (content === undefined || !arg.test(content)) return { didMatch: false, match: undefined };
+					else return { didMatch: true, match: (content.match(arg) as string[])[0] };
 					
-				}
+				};
 				
 			} else matcher = arg;
 			

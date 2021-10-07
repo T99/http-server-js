@@ -2,17 +2,36 @@ import { AbstractRouter } from "./abstract-router";
 import { IncomingHTTPRequest } from "../messages/incoming-http-request";
 import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
 
-export type MatcherFunction<T> = (content: T) => boolean | Promise<boolean>;
+export type MatcherResult<T> = { didMatch: true, match: T } | { didMatch: false, match: undefined };
+
+export type MatcherFunction<T> = (content: T) => MatcherResult<T> | Promise<MatcherResult<T>>;
 
 export abstract class SimpleAbstractRouter<T> extends AbstractRouter {
 	
 	protected matcher: MatcherFunction<T>
+	
+	protected parameter?: string;
 	
 	protected constructor(matcher: MatcherFunction<T>, parameter?: string) {
 		
 		super();
 		
 		this.matcher = matcher;
+		this.parameter = parameter;
+		
+	}
+	
+	protected async onRoute(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<void> {
+		
+		await super.onRoute(request, response);
+		
+		if (this.parameter !== undefined) {
+			
+			let parameterValue: T = (await this.matcher(await this.supply(request, response))).match as T;
+			
+			request.getRoutingInfo().setParameter(this.parameter, parameterValue);
+			
+		}
 		
 	}
 	
@@ -33,7 +52,7 @@ export abstract class SimpleAbstractRouter<T> extends AbstractRouter {
 	
 	public async shouldRoute(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<boolean> {
 		
-		return await this.matcher(await this.supply(request, response));
+		return (await this.matcher(await this.supply(request, response))).didMatch;
 		
 	}
 }

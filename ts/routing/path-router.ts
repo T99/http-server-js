@@ -1,24 +1,14 @@
 import { SimpleStringAbstractRouter } from "./simple-string-abstract-router";
 import { IncomingHTTPRequest } from "../messages/incoming-http-request";
 import { OutgoingHTTPResponse } from "../messages/outgoing-http-response";
-import { MatcherFunction } from "./simple-abstract-router";
 
 export class PathRouter extends SimpleStringAbstractRouter {
 	
-	public constructor(content: string, caseSensitive?: boolean, parameter?: string);
-	public constructor(regex: RegExp, parameter?: string);
-	public constructor(matcher: MatcherFunction<string | undefined>, parameter?: string);
-	public constructor(arg: string | RegExp | MatcherFunction<string | undefined>,
-						  parameterOrCaseSensitive?: string | boolean,
-						  parameter?: string) {
+	protected async onRoute(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<void> {
 		
-		super(arg, parameterOrCaseSensitive, parameter);
+		await super.onRoute(request, response);
 		
-		this.addMiddlewareAtBeginning((request: IncomingHTTPRequest): void => {
-			
-			request.getRoutingInfo().popNextPathComponent();
-			
-		});
+		request.getRoutingInfo().popNextPathComponent();
 		
 	}
 	

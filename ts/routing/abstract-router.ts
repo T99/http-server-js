@@ -71,7 +71,27 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 		
 	}
 	
+	/**
+	 * Prepares/modifies the request and response objects in whatever way is necessary to be routed this by router.
+	 * 
+	 * This function is run at the very beginning of the routing process of this router, and often serves as a special
+	 * sort of Middleware function.
+	 * 
+	 * @param {IncomingHTTPRequest} request The HTTP request that is being routed by this router.
+	 * @param {OutgoingHTTPResponse} response The HTTP response associated with the provided HTTP request object. 
+	 * @returns {Promise<void>} A Promise that resolves once this function is finished preparing the request/response
+	 * pair.
+	 */
+	protected async onRoute(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<void> {
+		
+		return;
+		
+	}
+	
 	public async route(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<void> {
+		
+		// Run the internal 'pre-routing' handler for this router.
+		await this.onRoute(request, response);
 		
 		// Run the pre-handler middleware(s).
 		await this.middlewareManager.executePreHandlerMiddleware(request, response);
