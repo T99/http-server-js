@@ -159,6 +159,15 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		
 		this.timestamp = Date.now();
 		
+		for (let headerField of this.getHeadersManager().getHeaderFields()) {
+			
+			this.originalResponse.setHeader(
+				headerField,
+				this.getHeadersManager().getAuthoritativeHeader(headerField) as string
+			);
+			
+		}
+		
 		return new Promise<void>((resolve: () => void, reject: (reason?: any) => void): void => {
 			
 			this.originalResponse.on("error", (error: Error): void => {
