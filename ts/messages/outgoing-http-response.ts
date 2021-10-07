@@ -76,6 +76,48 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		
 		this.setStatusCode(error.getHTTPStatusCode());
 		
+		if ((this.getMatchingRequest()?.getHeadersManager().getHeader("Accept") ?? []).includes("text/html")) {
+			
+			let status: HTTPStatusCode = this.getStatusCode();
+			
+			let titleWords: string[] = status.getTitle(false).split("_");
+			
+			for (let i: number = 0; i < titleWords.length; i++) {
+				
+				titleWords[i] = titleWords[i].substr(0, 1) + titleWords[i].substr(1).toLowerCase();
+				
+			}
+			
+			let html: string = `
+				<h1 title="${status.getExplanation()}">${status.getStatusCode()} - ${titleWords.join(" ")}</h1>
+				<p>${error.getUserMessage()}</p>
+			`;
+			
+			if (Object.keys(error.getExtras()).length > 0) {
+				
+				html += `<pre style="tab-size: 4; -moz-tab-size: 4">`;
+				html += `${JSON.stringify(error.getExtras(), null, "\t")}`;
+				html += `</pre>`;
+				
+			}
+			
+			this.getHeadersManager().setHeader("Content-Type", "text/html");
+			this.setBody(html);
+			
+		} else {
+			
+			this.getHeadersManager().setHeader("Content-Type", "application/json");
+			this.setBody({
+				error: {
+					title: error.getErrorTitle(),
+					developerMessage: error.getDeveloperMessage(),
+					userMessage: error.getUserMessage(),
+					...error.getExtras()
+				}
+			});
+			
+		}
+		
 		await this.send();
 		
 	}
