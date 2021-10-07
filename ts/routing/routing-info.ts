@@ -124,7 +124,7 @@ export class RoutingInfo {
 		
 	}
 	
-	public addParameter(parameter: string, value: any): void {
+	public setParameter(parameter: string, value: any): void {
 		
 		this.routingParameters.set(parameter, value);
 		
