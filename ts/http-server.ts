@@ -1,10 +1,11 @@
 import http from "http";
 import { HTTPStatusCode, HTTPVersionObject } from "@t99/http";
-import { AbstractRouter } from "./routing/abstract-router";
 import { IncomingHTTPRequest } from "./messages/incoming-http-request";
 import { OutgoingHTTPResponse } from "./messages/outgoing-http-response";
 import { MiddlewareFunction } from "./middleware/middleware";
 import { ClientAccessibleError } from "./error/client-accessible-error";
+import { InternalServerError } from "./error/internal-server-error";
+import { Router } from "./routing/router";
 
 // TODO [10/1/2021 @ 12:25 PM] Should these two methods be moved somewhere else? Their own file?
 
@@ -42,7 +43,7 @@ export async function defaultRequestFulfillmentChecker(request: IncomingHTTPRequ
 	
 }
 
-export class HTTPServer extends AbstractRouter {
+export class HTTPServer extends Router {
 	
 	protected unhandledRequestHandler: MiddlewareFunction;
 	
@@ -171,12 +172,6 @@ export class HTTPServer extends AbstractRouter {
 	public setRequestFulfillmentChecker(handler: MiddlewareFunction<boolean>): void {
 		
 		this.requestFulfillmentChecker = handler;
-		
-	}
-	
-	public async shouldRoute(request: IncomingHTTPRequest, response: OutgoingHTTPResponse): Promise<boolean> {
-		
-		return true;
 		
 	}
 	
