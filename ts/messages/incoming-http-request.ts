@@ -2,6 +2,8 @@ import http from "http";
 import { AbstractIncomingHTTPRequest, HTTPRequestConfig, HTTPHeadersManager } from "@t99/http";
 import { RoutingInfo } from "../routing/routing-info";
 import { HTTPServer } from "../http-server";
+import { ClientAccessibleError } from "../error/client-accessible-error";
+import { InternalServerError } from "../error/internal-server-error";
 
 export type IncomingHTTPRequestConfig = HTTPRequestConfig & {
 	
@@ -23,6 +25,8 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 	
 	protected routingInfo: RoutingInfo;
 	
+	protected hasBodyBeenRead: boolean;
+	
 	public constructor(config: IncomingHTTPRequestConfig) {
 		
 		super(config);
@@ -31,6 +35,7 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 		this.originalRequest = config.originalRequest;
 		this.recipientServer = config.recipientServer;
 		this.routingInfo = new RoutingInfo(this.getURL());
+		this.hasBodyBeenRead = false;
 		
 	}
 	
@@ -66,6 +71,35 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 	public timeReceived(): number {
 		
 		return this.timestamp;
+		
+	}
+	
+	public async getBody(): Promise<any> {
+		
+		if (!this.hasBodyBeenRead) {
+			
+			this.body = await new Promise<any>((resolve: (value: any) => void,
+												reject: (reason: ClientAccessibleError) => void): void => {
+				
+				let incomingBody: string = "";
+				
+				this.originalRequest.on("error", (error: Error): void => {
+					
+					reject(new InternalServerError(error.message, error));
+					
+				});
+				
+				this.originalRequest.on("data", (chunk: any): any => incomingBody += chunk);
+				
+				this.originalRequest.on("end", (): void => resolve(incomingBody));
+				
+			});
+			
+			this.hasBodyBeenRead = true;
+			
+		}
+		
+		return this.body;
 		
 	}
 	
