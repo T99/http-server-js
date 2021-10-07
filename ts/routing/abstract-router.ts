@@ -19,19 +19,19 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 	
 	protected handler: MiddlewareFunction | undefined;
 	
-	public addMiddlewareAtBeginning: MiddlewareRegistrationFunction;
-	public addMiddlewareBeforeHandler: MiddlewareRegistrationFunction;
-	public addMiddlewareAfterHandler: MiddlewareRegistrationFunction;
-	public addMiddlewareAtEnd: MiddlewareRegistrationFunction;
+	public attachMiddlewareAtBeginning: MiddlewareRegistrationFunction;
+	public attachMiddlewareBeforeHandler: MiddlewareRegistrationFunction;
+	public attachMiddlewareAfterHandler: MiddlewareRegistrationFunction;
+	public attachMiddlewareAtEnd: MiddlewareRegistrationFunction;
 	
 	protected constructor() {
 		
 		this.middlewareManager = new MiddlewareManager();
 		
-		this.addMiddlewareAtBeginning = this.middlewareManager.addMiddlewareAtBeginning;
-		this.addMiddlewareBeforeHandler = this.middlewareManager.addMiddlewareBeforeHandler;
-		this.addMiddlewareAfterHandler = this.middlewareManager.addMiddlewareAfterHandler;
-		this.addMiddlewareAtEnd = this.middlewareManager.addMiddlewareAtEnd;
+		this.attachMiddlewareAtBeginning = (middleware) => this.middlewareManager.attachMiddlewareAtBeginning(middleware);
+		this.attachMiddlewareBeforeHandler = (middleware) => this.middlewareManager.attachMiddlewareBeforeHandler(middleware);
+		this.attachMiddlewareAfterHandler = (middleware) => this.middlewareManager.attachMiddlewareAfterHandler(middleware);
+		this.attachMiddlewareAtEnd = (middleware) => this.middlewareManager.attachMiddlewareAtEnd(middleware);
 		
 		this.routes = [];
 		
