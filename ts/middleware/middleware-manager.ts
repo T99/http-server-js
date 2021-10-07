@@ -57,25 +57,25 @@ export class MiddlewareManager implements MiddlewareExecutor {
 		
 	}
 	
-	public addMiddlewareAtBeginning(middleware: Middlewareable): void {
+	public attachMiddlewareAtBeginning(middleware: Middlewareable): void {
 		
 		this.preHandlerMiddleware.unshift(Middleware.normalizeMiddlewareable(middleware));
 		
 	}
 	
-	public addMiddlewareBeforeHandler(middleware: Middlewareable): void {
+	public attachMiddlewareBeforeHandler(middleware: Middlewareable): void {
 		
 		this.preHandlerMiddleware.push(Middleware.normalizeMiddlewareable(middleware));
 		
 	}
 	
-	public addMiddlewareAfterHandler(middleware: Middlewareable): void {
+	public attachMiddlewareAfterHandler(middleware: Middlewareable): void {
 		
 		this.postHandlerMiddleware.unshift(Middleware.normalizeMiddlewareable(middleware));
 		
 	}
 	
-	public addMiddlewareAtEnd(middleware: Middlewareable): void {
+	public attachMiddlewareAtEnd(middleware: Middlewareable): void {
 		
 		this.postHandlerMiddleware.push(Middleware.normalizeMiddlewareable(middleware));
 		

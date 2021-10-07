@@ -16,7 +16,7 @@ export interface MiddlewareExecutor {
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareAtBeginning(middleware: Middlewareable): void;
+	attachMiddlewareAtBeginning(middleware: Middlewareable): void;
 	
 	/**
 	 * Adds the specified middleware in such a way as to run before this MiddlewareExecutor's #handler method, but
@@ -24,7 +24,7 @@ export interface MiddlewareExecutor {
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareBeforeHandler(middleware: Middlewareable): void;
+	attachMiddlewareBeforeHandler(middleware: Middlewareable): void;
 	
 	/**
 	 * Adds the specified middleware in such a way as to run after this MiddlewareExecutor's #handler method, but
@@ -32,13 +32,13 @@ export interface MiddlewareExecutor {
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareAfterHandler(middleware: Middlewareable): void;
+	attachMiddlewareAfterHandler(middleware: Middlewareable): void;
 	
 	/**
 	 * Adds the specified middleware after all other middleware for this MiddlewareExecutor.
 	 *
 	 * @param {Middlewareable} middleware The middleware to add to this MiddlewareExecutor in the specified manner.
 	 */
-	addMiddlewareAtEnd(middleware: Middlewareable): void;
+	attachMiddlewareAtEnd(middleware: Middlewareable): void;
 	
 }

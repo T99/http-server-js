@@ -1,5 +1,5 @@
-import { ClientAccessibleError } from "./client-accessible-error";
 import { HTTPStatusCode } from "@t99/http";
+import { ClientAccessibleError } from "./client-accessible-error";
 
 export class GenericNotFoundError extends ClientAccessibleError {
 	
