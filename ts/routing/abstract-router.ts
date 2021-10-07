@@ -96,26 +96,34 @@ export abstract class AbstractRouter implements MiddlewareExecutor {
 		// Run the pre-handler middleware(s).
 		await this.middlewareManager.executePreHandlerMiddleware(request, response);
 		
+		let didRoutingContinue: boolean = false;
+		
 		// Search for a sub-route to further route the request.
 		for (let i: number = 0; i < this.routes.length && !response.hasBeenSent(); i++) {
 			
 			if (await this.routes[i].shouldRoute(request, response)) {
 				
+				didRoutingContinue = true;
+				
 				await this.routes[i].route(request, response);
-				
-				await this.middlewareManager.executePostHandlerMiddleware(request, response);
-				
-				return;
 				
 			}
 			
 		}
 		
-		if (await request.getRecipientServer().checkRequestFulfillment(request, response) && this.hasHandler()) {
+		// If a sub-route was not found to further route/handle the request, let this router deal with it.
+		if (!didRoutingContinue) {
 			
-			await this.handle(request, response);
+			if (await request.getRecipientServer().checkRequestFulfillment(request, response) && this.hasHandler()) {
+				
+				await this.handle(request, response);
+				
+			} else await request.getRecipientServer().handleUnhandledRequest(request, response);
 			
-		} else await request.getRecipientServer().handleUnhandledRequest(request, response);
+		}
+		
+		// Run the post-handler middleware(s).
+		await this.middlewareManager.executePostHandlerMiddleware(request, response);
 		
 	}
 	
