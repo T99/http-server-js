@@ -73,10 +73,28 @@ export class HTTPServer extends Router {
 			request.setMatchingResponse(response);
 			response.setMatchingRequest(request);
 			
-			this.route(request, response).catch((error: any): void => {
+			this.route(request, response).catch(async (error: any): Promise<void> => {
 				
 				// TODO [9/30/2021 @ 3:16 PM] Properly log the error!
-				console.log(`error!`);
+				
+				if (error instanceof ClientAccessibleError) {
+					
+					console.log(`${(error as ClientAccessibleError).getHTTPStatusCode().getStatusCode()} error!`);
+					
+					await response.sendError(error);
+					
+				} else {
+					
+					let serverError: InternalServerError = new InternalServerError(
+						error?.message ?? "Unspecified error.",
+						error
+					);
+					
+					await response.sendError(serverError);
+					
+					throw serverError;
+					
+				}
 				
 			});
 		
