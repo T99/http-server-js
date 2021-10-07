@@ -180,5 +180,20 @@ export class HTTPServer extends Router {
 		return this.version;
 	
 	}
+	
+	public close(): Promise<void> {
+		
+		return new Promise<void>((resolve: () => void, reject: (reason: Error) => void): void => {
+			
+			this.server.close((error?: Error): void => {
+				
+				if (error !== undefined) reject(new InternalServerError(error.message));
+				else resolve();
+				
+			});
+			
+		});
+		
+	}
 
 }
