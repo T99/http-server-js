@@ -76,7 +76,7 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		
 		this.setStatusCode(error.getHTTPStatusCode());
 		
-		if ((this.getMatchingRequest()?.getHeadersManager().getHeader("Accept") ?? []).includes("text/html")) {
+		if ((this.getMatchingRequest()?.headers.getHeader("Accept") ?? []).includes("text/html")) {
 			
 			let status: HTTPStatusCode = this.getStatusCode();
 			
@@ -101,12 +101,12 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 				
 			}
 			
-			this.getHeadersManager().setHeader("Content-Type", "text/html");
+			this.headers.setHeader("Content-Type", "text/html");
 			this.setBody(html);
 			
 		} else {
 			
-			this.getHeadersManager().setHeader("Content-Type", "application/json");
+			this.headers.setHeader("Content-Type", "application/json");
 			this.setBody({
 				error: {
 					title: error.getErrorTitle(),
@@ -159,11 +159,11 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 		
 		this.timestamp = Date.now();
 		
-		for (let headerField of this.getHeadersManager().getHeaderFields()) {
+		for (let headerField of this.headers.getHeaderFields()) {
 			
 			this.originalResponse.setHeader(
 				headerField,
-				this.getHeadersManager().getAuthoritativeHeader(headerField) as string
+				this.headers.getAuthoritativeHeader(headerField) as string
 			);
 			
 		}
