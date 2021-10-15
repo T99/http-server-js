@@ -27,6 +27,8 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 	
 	protected hasBodyBeenRead: boolean;
 	
+	public readonly middlewareData: Map<string, any>;
+	
 	public constructor(config: IncomingHTTPRequestConfig) {
 		
 		super(config);
@@ -36,6 +38,7 @@ export class IncomingHTTPRequest extends AbstractIncomingHTTPRequest {
 		this.recipientServer = config.recipientServer;
 		this.routingInfo = new RoutingInfo(this.getURL());
 		this.hasBodyBeenRead = false;
+		this.middlewareData = new Map();
 		
 	}
 	
