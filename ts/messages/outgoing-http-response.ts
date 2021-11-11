@@ -184,37 +184,32 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 				
 			});
 			
-			// If the data is being piped from an outside source...
-			// if (this.contentOriginStream !== undefined) {
-			//
-			// 	this.contentOriginStream.on("open", (): void => {
-			//
-			// 		this.contentOriginStream?.pipe(this.internalResponse);
-			//
-			// 	});
-			//
-			// 	this.contentOriginStream.on("end", (): void => {
-			//
-			// 		this.contentOriginStream?.close();
-			// 		this.internalResponse.end((): void => resolve());
-			//
-			// 	});
-			//
-			// } else {
-			
-			this.originalResponse.write(this.getPreparedBody(), (error: Error | null | undefined): void => {
+			/* There is currently an 'issue' (quoted here because it is not seen as an issue by the NodeJS team) wherein
+			 * attempting to write ANY content to the body of a response that has a 204 - NO CONTENT status code causes
+			 * the server to hang indefinitely without ever closing the message buffer (and therefore writing out the
+			 * response to the client).
+			 * 
+			 * If, at some point in the future, there is some workaround to this, a preferable approach would be to
+			 * instead have this behavior configurable, wherein the end-developer would be able to choose if this should
+			 * be treated as an explicit error, whether a warning should be emitted, or whether the body should be
+			 * silently truncated from the outgoing response (or perhaps even just to plainly allow response bodies with
+			 * 204's).
+			 */
+			if (this.getStatusCode() !== HTTPStatusCode.HTTP_NO_CONTENT) {
 				
-				if (error !== null && error !== undefined) {
+				this.originalResponse.write(this.getPreparedBody(), (error: Error | null | undefined): void => {
 					
-					reject(new InternalServerError("Error writing body to client.", error));
+					if (error !== null && error !== undefined) {
+						
+						reject(new InternalServerError("Error writing body to client.", error));
+						
+					}
 					
-				}
+					this.originalResponse.end(resolve);
+					
+				});
 				
-				this.originalResponse.end((): void => resolve());
-				
-			});
-			
-			// }
+			} else this.originalResponse.end(resolve);
 		
 		});
 		
