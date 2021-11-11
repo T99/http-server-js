@@ -53,7 +53,15 @@ export class OutgoingHTTPResponse extends AbstractOutgoingHTTPResponse {
 	
 	public setStatusCode(statusCode: number | HTTPStatusCode): void {
 		
-		super.setStatusCode(statusCode);
+		try {
+			
+			super.setStatusCode(statusCode);
+			
+		} catch (error: any) {
+			
+			throw new InternalServerError("Failed to set the status code of an OutgoingHTTPResponse.", error);
+			
+		}
 		
 		this.originalResponse.statusCode = this.getStatusCode().getStatusCode();
 		this.originalResponse.statusMessage = this.getStatusCode().getExplanation();
