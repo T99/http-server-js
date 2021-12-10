@@ -2,6 +2,9 @@
 	"name": "@t99/http-server",
 	"version": "0.1.0",
 	"description": "My own personal HTTP server library for NodeJS - written in TypeScript.",
+	"publishConfig": {
+		"access": "public"
+	},
 	"main": "js/main",
 	"types": ".d.ts/main",
 	"scripts": {
